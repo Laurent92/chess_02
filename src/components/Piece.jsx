@@ -3,19 +3,20 @@ import { getCellColor } from '../data/pieces';
 const CELL_SIZE = 48;
 
 export default function Piece({ piece }) {
-  const { id, cells, phase } = piece;
+  const { id, label, cells, phase } = piece;
 
-  // Calculer les dimensions du bounding box
   const maxRow = Math.max(...cells.map(([r]) => r));
   const maxCol = Math.max(...cells.map(([, c]) => c));
   const rows = maxRow + 1;
   const cols = maxCol + 1;
 
-  // Créer une grille pour savoir quelles cases sont occupées
   const grid = Array.from({ length: rows }, () => Array(cols).fill(false));
   cells.forEach(([r, c]) => {
     grid[r][c] = true;
   });
+
+  // Case sur laquelle afficher le label
+  const labelCell = label != null ? cells[label.cellIndex] : null;
 
   return (
     <div className="piece-container">
@@ -23,6 +24,7 @@ export default function Piece({ piece }) {
       <div
         className="piece-grid"
         style={{
+          position: 'relative',
           display: 'grid',
           gridTemplateColumns: `repeat(${cols}, ${CELL_SIZE}px)`,
           gridTemplateRows: `repeat(${rows}, ${CELL_SIZE}px)`,
@@ -41,7 +43,6 @@ export default function Piece({ piece }) {
               );
             }
             const color = getCellColor(r, c, phase);
-            // Déterminer les bordures (pas de bordure entre cases adjacentes de la pièce)
             const hasTop = r > 0 && grid[r - 1]?.[c];
             const hasBottom = r < rows - 1 && grid[r + 1]?.[c];
             const hasLeft = c > 0 && grid[r][c - 1];
@@ -62,6 +63,19 @@ export default function Piece({ piece }) {
               />
             );
           })
+        )}
+        {labelCell && (
+          <div
+            className="piece-number"
+            style={{
+              position: 'absolute',
+              top: (labelCell[0] + 0.5) * CELL_SIZE,
+              left: (labelCell[1] + 0.5) * CELL_SIZE,
+              transform: 'translate(-50%, -50%)',
+            }}
+          >
+            {label.text}
+          </div>
         )}
       </div>
       <div className="piece-info">{cells.length} cases</div>

@@ -71,3 +71,13 @@ h1 {
   background: #f9a825;
   border: 2px solid #1a1a1a;
 }
+
+.piece-number {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #1a3a1a;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.5);
+  pointer-events: none;
+  user-select: none;
+  z-index: 1;
+}
