@@ -1,22 +1,26 @@
-import { getCellColor } from '../data/pieces';
+import { rotateCells, getRotatedCellColor } from '../data/pieces';
 
 const CELL_SIZE = 48;
 
 export default function Piece({ piece }) {
-  const { id, label, cells, phase } = piece;
+  const { id, label, cells, phase, rotation = 0 } = piece;
 
-  const maxRow = Math.max(...cells.map(([r]) => r));
-  const maxCol = Math.max(...cells.map(([, c]) => c));
+  const displayCells = rotateCells(cells, rotation);
+
+  const maxRow = Math.max(...displayCells.map(([r]) => r));
+  const maxCol = Math.max(...displayCells.map(([, c]) => c));
   const rows = maxRow + 1;
   const cols = maxCol + 1;
 
   const grid = Array.from({ length: rows }, () => Array(cols).fill(false));
-  cells.forEach(([r, c]) => {
+  displayCells.forEach(([r, c]) => {
     grid[r][c] = true;
   });
 
-  // Case sur laquelle afficher le label
-  const labelCell = label != null ? cells[label.cellIndex] : null;
+  // La case d'affichage du label suit la rotation
+  const labelDisplayCell = label != null
+    ? rotateCells(cells, rotation)[label.valueCellIndexDisplay]
+    : null;
 
   return (
     <div className="piece-container">
@@ -42,7 +46,7 @@ export default function Piece({ piece }) {
                 />
               );
             }
-            const color = getCellColor(r, c, phase);
+            const color = getRotatedCellColor(r, c, rotation, cells, phase);
             const hasTop = r > 0 && grid[r - 1]?.[c];
             const hasBottom = r < rows - 1 && grid[r + 1]?.[c];
             const hasLeft = c > 0 && grid[r][c - 1];
@@ -64,17 +68,17 @@ export default function Piece({ piece }) {
             );
           })
         )}
-        {labelCell && (
+        {labelDisplayCell && (
           <div
             className="piece-number"
             style={{
               position: 'absolute',
-              top: (labelCell[0] + 0.5) * CELL_SIZE,
-              left: (labelCell[1] + 0.5) * CELL_SIZE,
+              top: (labelDisplayCell[0] + 0.5) * CELL_SIZE,
+              left: (labelDisplayCell[1] + 0.5) * CELL_SIZE,
               transform: 'translate(-50%, -50%)',
             }}
           >
-            {label.text}
+            {label.value}
           </div>
         )}
       </div>
