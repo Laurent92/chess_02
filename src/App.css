@@ -19,6 +19,32 @@ h1 {
   font-size: 1.1rem;
 }
 
+.toolbar {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.toolbar button {
+  padding: 6px 16px;
+  border: 1px solid #a08060;
+  border-radius: 4px;
+  background: #faf6f0;
+  color: #2c1810;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.toolbar button:hover:not(:disabled) {
+  background: #ede4d8;
+}
+
+.toolbar button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
 .app-layout {
   display: flex;
   gap: 40px;
@@ -32,6 +58,9 @@ h1 {
   justify-content: center;
   flex: 1;
   min-width: 0;
+  border: 2px dashed #a08060;
+  border-radius: 8px;
+  padding: 16px;
 }
 
 /* Board */

@@ -1,11 +1,59 @@
-import { useState } from 'react'
+import { useReducer, useCallback, useEffect } from 'react'
 import PIECES, { rotateCells, getRotatedCellColor } from './data/pieces'
 import Piece from './components/Piece'
 import Board from './components/Board'
 import './App.css'
 
+function undoableReducer(state, action) {
+  const { past, present, future } = state
+  switch (action.type) {
+    case 'SET': {
+      const next = typeof action.updater === 'function' ? action.updater(present) : action.updater
+      if (next === present) return state
+      return { past: [...past, present], present: next, future: [] }
+    }
+    case 'UNDO': {
+      if (past.length === 0) return state
+      return { past: past.slice(0, -1), present: past[past.length - 1], future: [present, ...future] }
+    }
+    case 'REDO': {
+      if (future.length === 0) return state
+      return { past: [...past, present], present: future[0], future: future.slice(1) }
+    }
+    default: return state
+  }
+}
+
+function useUndoable(initialState) {
+  const [{ past, present, future }, dispatch] = useReducer(undoableReducer, {
+    past: [], present: initialState, future: [],
+  })
+
+  const setState = useCallback((updater) => dispatch({ type: 'SET', updater }), [])
+  const undo = useCallback(() => dispatch({ type: 'UNDO' }), [])
+  const redo = useCallback(() => dispatch({ type: 'REDO' }), [])
+
+  return { state: present, setState, undo, redo, canUndo: past.length > 0, canRedo: future.length > 0 }
+}
+
 function App() {
-  const [placedPieces, setPlacedPieces] = useState({})
+  const { state: placedPieces, setState: setPlacedPieces, undo, redo, canUndo, canRedo } = useUndoable({})
+
+  // Ctrl+Z / Ctrl+Y keyboard shortcuts
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault()
+        undo()
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+        e.preventDefault()
+        redo()
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [undo, redo])
 
   function isValidPlacement(piece, originRow, originCol, currentPlaced) {
     const rotation = piece.rotation ?? 0
@@ -56,6 +104,10 @@ function App() {
     <div className="app">
       <h1>Sectional Checkerboard</h1>
       <p className="subtitle">Puzzle de Luers (1880) — 15 pièces, 6 013 solutions</p>
+      <div className="toolbar">
+        <button onClick={undo} disabled={!canUndo} title="Annuler (Ctrl+Z)">Annuler</button>
+        <button onClick={redo} disabled={!canRedo} title="Rétablir (Ctrl+Y)">Rétablir</button>
+      </div>
       <div className="app-layout">
         <div
           className="pieces-gallery"
