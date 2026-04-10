@@ -24,9 +24,12 @@ export default function Piece({ piece }) {
     : null;
 
   function handleDragStart(e) {
-    e.dataTransfer.setData('text/plain', JSON.stringify({ pieceId: id, anchorRow: 0, anchorCol: 0 }))
+    const rect = e.currentTarget.getBoundingClientRect()
+    const anchorCol = Math.floor((e.clientX - rect.left) / CELL_SIZE)
+    const anchorRow = Math.floor((e.clientY - rect.top) / CELL_SIZE)
+    e.dataTransfer.setData('text/plain', JSON.stringify({ pieceId: id, anchorRow, anchorCol }))
     e.dataTransfer.effectAllowed = 'move'
-    const { element, offsetX, offsetY } = createPieceDragImage(piece, 0, 0)
+    const { element, offsetX, offsetY } = createPieceDragImage(piece, anchorRow, anchorCol)
     e.dataTransfer.setDragImage(element, offsetX, offsetY)
     setTimeout(() => document.body.removeChild(element), 0)
   }
