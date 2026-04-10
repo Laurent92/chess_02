@@ -41,7 +41,10 @@ export function createPieceDragImage(piece, anchorLocalRow, anchorLocalCol) {
       if (cellSet.has(`${r},${c}`)) {
         const color = getRotatedCellColor(r, c, rotation, cells, phase)
         cell.style.background = color === 'R' ? '#c62828' : '#f9a825'
-        cell.style.border = '2px solid #1a1a1a'
+        if (!cellSet.has(`${r-1},${c}`)) cell.style.borderTop    = '2px solid #1a1a1a'
+        if (!cellSet.has(`${r+1},${c}`)) cell.style.borderBottom = '2px solid #1a1a1a'
+        if (!cellSet.has(`${r},${c-1}`)) cell.style.borderLeft   = '2px solid #1a1a1a'
+        if (!cellSet.has(`${r},${c+1}`)) cell.style.borderRight  = '2px solid #1a1a1a'
       }
       container.appendChild(cell)
     }
