@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run:*)",
+      "Bash(python -c ':*)",
+      "Bash(npx vite:*)",
+      "Bash(gh auth:*)",
+      "Bash(gh repo:*)",
+      "Bash(gh api:*)",
+      "Bash(start http://localhost:5173)",
+      "Bash(git add:*)",
+      "Bash(git commit -m ':*)",
+      "Bash(git push:*)",
+      "Bash(git config:*)",
+      "Bash(taskkill /F /IM node.exe)",
+      "Bash(netstat -ano)",
+      "Bash(taskkill:*)",
+      "Bash(cmd:*)",
+      "Bash(grep -E \"\\\\.\\(ts|tsx|json\\)$\")",
+      "Bash(cat)",
+      "Bash(node /tmp/count_cells.js)",
+      "Bash(node /tmp/count_cells.mjs)",
+      "Bash(sed 's/cells: //g')",
+      "Bash(python3)",
+      "Bash(npm:*)"
+    ]
+  }
+}

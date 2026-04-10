@@ -1,4 +1,5 @@
 import { rotateCells, getRotatedCellColor } from '../data/pieces';
+import { createPieceDragImage } from '../utils/dragImage';
 
 const CELL_SIZE = 48;
 
@@ -22,9 +23,16 @@ export default function Piece({ piece }) {
     ? rotateCells(cells, rotation)[label.valueCellIndexDisplay]
     : null;
 
+  function handleDragStart(e) {
+    e.dataTransfer.setData('text/plain', JSON.stringify({ pieceId: id, anchorRow: 0, anchorCol: 0 }))
+    e.dataTransfer.effectAllowed = 'move'
+    const { element, offsetX, offsetY } = createPieceDragImage(piece, 0, 0)
+    e.dataTransfer.setDragImage(element, offsetX, offsetY)
+    setTimeout(() => document.body.removeChild(element), 0)
+  }
+
   return (
-    <div className="piece-container">
-      <div className="piece-label">#{id}</div>
+    <div className="piece-container" draggable onDragStart={handleDragStart}>
       <div
         className="piece-grid"
         style={{
@@ -82,7 +90,6 @@ export default function Piece({ piece }) {
           </div>
         )}
       </div>
-      <div className="piece-info">{cells.length} cases</div>
     </div>
   );
 }

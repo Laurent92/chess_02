@@ -10,6 +10,10 @@ La documentation est dans le répertoire @docs
 ## Objectif
 Permettre aux utilisateurs de jouer a ce casse tete via une interface graphique, la sourie, du drag'n drop. A chaque étape du jeu, il faut afficher le nombre de possibilité restant pour faire le casse tete
 
+## Conventions
+- Commits en anglais
+- Tests obligatoires pour chaque nouvelle fonction
+
 ## Commands
 
 ```bash

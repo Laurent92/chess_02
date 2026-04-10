@@ -25,7 +25,14 @@ Le puzzle admet exactement **6 013 solutions** (calculé à l'ère des micro-ord
 
 ## Les 15 pièces
 
-Les pièces sont numérotées de 1 à 16 (un numéro absent), de formes variées allant de 2 à 6 cases, visibles dans `docs/pieces.webp`. Une solution complète est visible dans `docs/1.webp`.
+Les pièces ont un valeur de 1 à 14s, sont de formes variées allant de 2 à 6 cases, visibles dans `docs/pieces.webp`. 
+Une seule pièce est en double, meme forme et meme valeur = 2
+Une solution complète est visible dans `docs/1.webp`.
+Une case de couleur rouge d'une pièce ne peut etre posé que sur une case sombre de l'équichier  
+Une case de couleur jaune d'une pièce ne peut etre posé que sur une case claire de l'équichier 
+Une pièce doit toujours etre dessinnée de mainière identique, qu'elle soit posé dans l'invetaire, en cours de drag'n drop ou posée sur l'échiquier
+Une pièce posée sur l'équichier doit pourvoir etre remise dans l'inventaire
+Deux pièces ne doivent pas se supperposer, meme partiellement   
 
 ## Interface à développer
 
