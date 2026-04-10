@@ -1,7 +1,6 @@
 import { rotateCells, getRotatedCellColor } from '../data/pieces';
 import { createPieceDragImage } from '../utils/dragImage';
-
-const CELL_SIZE = 48;
+import { CELL_SIZE } from '../constants';
 
 export default function Piece({ piece }) {
   const { id, label, cells, phase, rotation = 0 } = piece;

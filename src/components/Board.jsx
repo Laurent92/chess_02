@@ -1,23 +1,20 @@
-import { useState, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import PIECES, { rotateCells, getRotatedCellColor } from '../data/pieces'
 import { createPieceDragImage } from '../utils/dragImage'
+import { CELL_SIZE } from '../constants'
 
-const CELL_SIZE = 48
 const BOARD_BORDER = 16
 
 export default function Board({ placedPieces, onDrop }) {
+  // Track which piece is being dragged so we can dim it visually.
+  // The piece stays in placedPieces and in the DOM — we never remove
+  // the drag source element, which would cancel the browser drag.
   const [draggingPieceId, setDraggingPieceId] = useState(null)
 
-  useEffect(() => {
-    const handler = () => setDraggingPieceId(null)
-    document.addEventListener('dragend', handler)
-    return () => document.removeEventListener('dragend', handler)
-  }, [])
-
-  function handleDragOver(e) {
+  const handleDragOver = useCallback((e) => {
     e.preventDefault()
     e.dataTransfer.dropEffect = 'move'
-  }
+  }, [])
 
   function handleCellDrop(r, c, e) {
     e.preventDefault()
@@ -27,7 +24,26 @@ export default function Board({ placedPieces, onDrop }) {
     } catch { /* ignore malformed drag data */ }
   }
 
-  // 64 empty board cells — drop targets only
+  function handlePieceDragStart(e, piece, localRow, localCol) {
+    e.dataTransfer.setData('text/plain', JSON.stringify({
+      pieceId: piece.id,
+      anchorRow: localRow,
+      anchorCol: localCol,
+    }))
+    e.dataTransfer.effectAllowed = 'move'
+
+    const { element, offsetX, offsetY } = createPieceDragImage(piece, localRow, localCol)
+    e.dataTransfer.setDragImage(element, offsetX, offsetY)
+    setTimeout(() => document.body.removeChild(element), 0)
+
+    setDraggingPieceId(piece.id)
+  }
+
+  function handlePieceDragEnd() {
+    setDraggingPieceId(null)
+  }
+
+  // 64 board cells — drop targets
   const boardCells = []
   for (let r = 0; r < 8; r++) {
     for (let c = 0; c < 8; c++) {
@@ -43,11 +59,10 @@ export default function Board({ placedPieces, onDrop }) {
     }
   }
 
-  // Piece overlays — absolutely positioned, use same piece-cell classes as inventory
+  // Piece overlays
   const pieceOverlays = Object.entries(placedPieces).map(([idStr, { row, col }]) => {
     const pieceId = parseInt(idStr)
-    if (pieceId === draggingPieceId) return null
-
+    const isDragging = pieceId === draggingPieceId
     const piece = PIECES.find(p => p.id === pieceId)
     const rotation = piece.rotation ?? 0
     const rotated = rotateCells(piece.cells, rotation)
@@ -72,6 +87,9 @@ export default function Board({ placedPieces, onDrop }) {
           gridTemplateColumns: `repeat(${cols}, ${CELL_SIZE}px)`,
           gridTemplateRows: `repeat(${rows}, ${CELL_SIZE}px)`,
           pointerEvents: 'none',
+          // Dim the piece being dragged — element stays in DOM so drag isn't cancelled
+          opacity: isDragging ? 0.25 : 1,
+          transition: 'opacity 0.1s',
         }}
       >
         {grid.flatMap((rowArr, r) =>
@@ -102,18 +120,8 @@ export default function Board({ placedPieces, onDrop }) {
                   borderRight:  hasRight  ? 'none' : undefined,
                 }}
                 draggable
-                onDragStart={e => {
-                  e.dataTransfer.setData('text/plain', JSON.stringify({
-                    pieceId,
-                    anchorRow: r,
-                    anchorCol: c,
-                  }))
-                  e.dataTransfer.effectAllowed = 'move'
-                  const { element, offsetX, offsetY } = createPieceDragImage(piece, r, c)
-                  e.dataTransfer.setDragImage(element, offsetX, offsetY)
-                  setTimeout(() => document.body.removeChild(element), 0)
-                  setDraggingPieceId(pieceId)
-                }}
+                onDragStart={e => handlePieceDragStart(e, piece, r, c)}
+                onDragEnd={handlePieceDragEnd}
                 onDragOver={handleDragOver}
                 onDrop={e => handleCellDrop(row + r, col + c, e)}
               />

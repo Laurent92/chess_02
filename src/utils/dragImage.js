@@ -1,6 +1,5 @@
 import { rotateCells, getRotatedCellColor } from '../data/pieces'
-
-const CELL_SIZE = 48
+import { CELL_SIZE } from '../constants'
 
 /**
  * Crée un élément DOM temporaire représentant la pièce entière,
