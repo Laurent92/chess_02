@@ -2,7 +2,7 @@ import { rotateCells, getRotatedCellColor } from '../data/pieces';
 import { createPieceDragImage } from '../utils/dragImage';
 import { CELL_SIZE } from '../constants';
 
-export default function Piece({ piece }) {
+export default function Piece({ piece, placed }) {
   const { id, label, cells, phase, rotation = 0 } = piece;
 
   const displayCells = rotateCells(cells, rotation);
@@ -34,7 +34,11 @@ export default function Piece({ piece }) {
   }
 
   return (
-    <div className="piece-container" draggable onDragStart={handleDragStart}>
+    <div
+      className={`piece-container ${placed ? 'piece-placed' : ''}`}
+      draggable={!placed}
+      onDragStart={placed ? undefined : handleDragStart}
+    >
       <div
         className="piece-grid"
         style={{
@@ -56,6 +60,28 @@ export default function Piece({ piece }) {
                 />
               );
             }
+
+            if (placed) {
+              const hasTop = r > 0 && grid[r - 1]?.[c];
+              const hasBottom = r < rows - 1 && grid[r + 1]?.[c];
+              const hasLeft = c > 0 && grid[r][c - 1];
+              const hasRight = c < cols - 1 && grid[r][c + 1];
+              return (
+                <div
+                  key={`${r}-${c}`}
+                  className="piece-cell ghost"
+                  style={{
+                    gridRow: r + 1,
+                    gridColumn: c + 1,
+                    borderTop:    hasTop    ? 'none' : undefined,
+                    borderBottom: hasBottom ? 'none' : undefined,
+                    borderLeft:   hasLeft   ? 'none' : undefined,
+                    borderRight:  hasRight  ? 'none' : undefined,
+                  }}
+                />
+              );
+            }
+
             const color = getRotatedCellColor(r, c, rotation, cells, phase);
             const hasTop = r > 0 && grid[r - 1]?.[c];
             const hasBottom = r < rows - 1 && grid[r + 1]?.[c];
@@ -78,7 +104,7 @@ export default function Piece({ piece }) {
             );
           })
         )}
-        {labelDisplayCell && (
+        {labelDisplayCell && !placed && (
           <div
             className="piece-number"
             style={{

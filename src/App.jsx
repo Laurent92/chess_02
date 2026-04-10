@@ -98,6 +98,11 @@ function App() {
     })
   }
 
+  function handleReset() {
+    if (Object.keys(placedPieces).length === 0) return
+    setPlacedPieces({})
+  }
+
   const placedIds = new Set(Object.keys(placedPieces).map(Number))
 
   return (
@@ -107,6 +112,7 @@ function App() {
       <div className="toolbar">
         <button onClick={undo} disabled={!canUndo} title="Annuler (Ctrl+Z)">Annuler</button>
         <button onClick={redo} disabled={!canRedo} title="Rétablir (Ctrl+Y)">Rétablir</button>
+        <button onClick={handleReset} disabled={placedIds.size === 0} title="Tout remettre dans l'inventaire">Reset</button>
       </div>
       <div className="app-layout">
         <div
@@ -120,8 +126,8 @@ function App() {
             } catch { /* ignore malformed drag data */ }
           }}
         >
-          {PIECES.filter(p => !placedIds.has(p.id)).map((piece) => (
-            <Piece key={piece.id} piece={piece} />
+          {[...PIECES].sort((a, b) => a.label.value - b.label.value).map((piece) => (
+            <Piece key={piece.id} piece={piece} placed={placedIds.has(piece.id)} />
           ))}
         </div>
         <Board placedPieces={placedPieces} onDrop={handleDrop} />
