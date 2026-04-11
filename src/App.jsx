@@ -1,4 +1,4 @@
-import { useReducer, useCallback, useEffect } from 'react'
+import { useReducer, useCallback, useEffect, useState } from 'react'
 import PIECES, { rotateCells, getRotatedCellColor } from './data/pieces'
 import Piece from './components/Piece'
 import Board from './components/Board'
@@ -103,6 +103,7 @@ function App() {
     setPlacedPieces({})
   }
 
+  const [galleryDragOver, setGalleryDragOver] = useState(false)
   const placedIds = new Set(Object.keys(placedPieces).map(Number))
 
   return (
@@ -116,10 +117,15 @@ function App() {
       </div>
       <div className="app-layout">
         <div
-          className="pieces-gallery"
+          className={`pieces-gallery${galleryDragOver ? ' drag-over' : ''}`}
           onDragOver={e => e.preventDefault()}
+          onDragEnter={e => { e.preventDefault(); setGalleryDragOver(true) }}
+          onDragLeave={e => {
+            if (!e.currentTarget.contains(e.relatedTarget)) setGalleryDragOver(false)
+          }}
           onDrop={e => {
             e.preventDefault()
+            setGalleryDragOver(false)
             try {
               const { pieceId } = JSON.parse(e.dataTransfer.getData('text/plain'))
               if (placedIds.has(pieceId)) handleReturnToInventory(pieceId)

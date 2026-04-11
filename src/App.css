@@ -61,6 +61,13 @@ h1 {
   border: 2px dashed #a08060;
   border-radius: 8px;
   padding: 16px;
+  transition: background-color 0.15s, border-color 0.15s;
+}
+
+.pieces-gallery.drag-over {
+  background-color: rgba(160, 128, 96, 0.15);
+  border-color: #7a3b0e;
+  border-style: solid;
 }
 
 /* Board */
