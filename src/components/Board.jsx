@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import PIECES, { rotateCells, getRotatedCellColor } from '../data/pieces'
 import { createPieceDragImage } from '../utils/dragImage'
 import { CELL_SIZE } from '../constants'
@@ -42,6 +42,14 @@ export default function Board({ placedPieces, onDrop }) {
   function handlePieceDragEnd() {
     setDraggingPieceId(null)
   }
+
+  // Reset draggingPieceId when the dragged piece is removed from the board
+  // (e.g. dropped back to gallery — the overlay unmounts before onDragEnd fires)
+  useEffect(() => {
+    if (draggingPieceId !== null && !(draggingPieceId in placedPieces)) {
+      setDraggingPieceId(null)
+    }
+  }, [placedPieces, draggingPieceId])
 
   // 64 board cells — drop targets
   const boardCells = []
